@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Digital Bible</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Bible cover */
+        .cover {
+            width: 350px;
+            height: 500px;
+            background: linear-gradient(145deg, #4a4e69, #22223b);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.5s ease;
+        }
+
+        .cover:hover {
+            transform: scale(1.05);
+        }
+
+        .cover h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .cover p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .cover button {
+            padding: 10px 20px;
+            background-color: #9a8c98;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cover button:hover {
+            background-color: #6c757d;
+        }
+
+        /* Inside of the Bible pages */
+        .bible-pages {
+            display: none;
+            width: 400px;
+            height: 520px;
+            background-color: #fdf8e1;
+            border-radius: 10px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            text-align: justify;
+        }
+
+        .page-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .nav-btn {
+            position: absolute;
+            bottom: 20px;
+            padding: 10px 20px;
+            background-color: #4a4e69;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #22223b;
+        }
+
+        #prev-page {
+            left: 20px;
+        }
+
+        #next-page {
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+<!-- Bible Cover -->
+<div class="cover" id="bible-cover">
+    <h1>Holy Bible</h1>
+    <p>New Testament Verses</p>
+    <button>Open Bible</button>
+</div>
+
+<!-- Bible Pages -->
+<div class="bible-pages" id="bible-pages">
+    <div class="page-content" id="page-content">
+        <!-- Verses appear here -->
+    </div>
+    <button class="nav-btn" id="prev-page">&larr; Previous</button>
+    <button class="nav-btn" id="next-page">Next &rarr;</button>
+</div>
+
+<script>
+    // Bible verses array
+    const bibleVerses = [
+        "John 3:16 - For God so loved the world that he gave his one and only Son.",
+        "Philippians 4:13 - I can do all things through Christ who strengthens me.",
+        "Romans 8:28 - In all things God works for the good of those who love Him.",
+        "Matthew 11:28 - Come to me, all you who are weary and burdened.",
+        "Psalm 23:1 - The Lord is my shepherd; I shall not want.",
+        "2 Corinthians 5:17 - If anyone is in Christ, he is a new creation.",
+        "Jeremiah 29:11 - For I know the plans I have for you, declares the Lord.",
+        "Galatians 5:22 - The fruit of the Spirit is love, joy, peace, patience, kindness.",
+        "1 Peter 5:7 - Cast all your anxiety on Him because He cares for you.",
+        "Matthew 6:33 - Seek first His kingdom and His righteousness.",
+        "Proverbs 3:5-6 - Trust in the Lord with all your heart.",
+        "Isaiah 40:31 - Those who hope in the Lord will renew their strength.",
+        "Romans 12:12 - Be joyful in hope, patient in affliction, faithful in prayer.",
+        "Psalm 118:24 - This is the day the Lord has made; let us rejoice and be glad.",
+        "Ephesians 6:10 - Be strong in the Lord and in His mighty power.",
+        "Luke 6:31 - Do to others as you would have them do to you.",
+        "Psalm 145:18 - The Lord is near to all who call on Him.",
+        "Joshua 1:9 - Be strong and courageous. Do not be afraid.",
+        "Romans 5:8 - God demonstrates His own love for us in this: while we were sinners, Christ died for us.",
+        "Matthew 5:14 - You are the light of the world.",
+        "Psalm 46:1 - God is our refuge and strength, an ever-present help in trouble.",
+        "1 Thessalonians 5:16-18 - Rejoice always, pray continually, give thanks in all circumstances.",
+        "John 14:6 - Jesus answered, 'I am the way, the truth, and the life.'",
+        "Proverbs 18:10 - The name of the Lord is a strong tower; the righteous run to it and are safe.",
+        "1 Corinthians 13:4 - Love is patient, love is kind.",
+        "Philippians 4:6 - Do not be anxious about anything, but in everything, pray.",
+        "Psalm 37:4 - Take delight in the Lord, and He will give you the desires of your heart.",
+        "James 1:2-3 - Consider it pure joy when you face trials of many kinds.",
+        "Romans 8:38-39 - Nothing will be able to separate us from the love of God.",
+        "1 Corinthians 10:13 - No temptation has overtaken you except what is common to mankind.",
+        "Matthew 28:18 - All authority in heaven and on earth has been given to me.",
+        "Ephesians 2:8-9 - For it is by grace you have been saved, through faith.",
+        "Romans 6:23 - For the wages of sin is death, but the gift of God is eternal life.",
+        "1 John 4:19 - We love because He first loved us.",
+        "Romans 10:9 - If you declare with your mouth, 'Jesus is Lord,' and believe in your heart that God raised him from the dead, you will be saved.",
+        "John 8:32 - Then you will know the truth, and the truth will set you free.",
+        "Matthew 7:7 - Ask and it will be given to you; seek and you will find.",
+        "John 16:33 - I have told you these things, so that in me you may have peace.",
+        "Psalm 34:8 - Taste and see that the Lord is good.",
+        "Isaiah 41:10 - So do not fear, for I am with you.",
+        "Luke 1:37 - For nothing will be impossible with God.",
+        "1 John 1:9 - If we confess our sins, he is faithful and just and will forgive us our sins.",
+        "Romans 3:23 - For all have sinned and fall short of the glory of God.",
+        "Mark 10:27 - Jesus looked at them and said, 'With man this is impossible, but not with God.'",
+        "Luke 11:9 - So I say to you: Ask and it will be given to you; seek and you will find.",
+        "Acts 16:31 - Believe in the Lord Jesus, and you will be saved.",
+        "Psalm 119:105 - Your word is a lamp for my feet, a light on my path.",
+        "John 15:13 - Greater love has no one than this: to lay down one's life for one's friends.",
+        "Revelation 3:20 - Here I am! I stand at the door and knock.",
+        "1 Peter 1:3 - Praise be to the God and Father of our Lord Jesus Christ.",
+        "Colossians 3:23 - Whatever you do, work at it with all your heart.",
+        "1 Timothy 6:12 - Fight the good fight of the faith.",
+        "Matthew 21:22 - If you believe, you will receive whatever you ask for in prayer.",
+        "Mark 9:23 - 'If you can?' said Jesus. 'Everything is possible for one who believes.'",
+        "Romans 15:13 - May the God of hope fill you with all joy and peace.",
+        "Psalm 51:10 - Create in me a pure heart, O God.",
+        "Isaiah 55:8-9 - For my thoughts are not your thoughts, neither are your ways my ways.",
+        "Hebrews 11:1 - Now faith is confidence in what we hope for and assurance about what we do not see.",
+        "Philippians 1:6 - Being confident of this, that he who began a good work in you will carry it on to completion.",
+        "John 10:10 - I have come that they may have life, and have it to the full.",
+        "Matthew 10:29 - Are not two sparrows sold for a penny?",
+        "Romans 8:1 - Therefore, there is now no condemnation for those who are in Christ Jesus.",
+        "Matthew 5:16 - Let your light shine before others, that they may see your good deeds.",
+        "John 14:27 - Peace I leave with you; my peace I give you.",
+        "Luke 10:27 - Love the Lord your God with all your heart and with all your soul and with all your strength.",
+        "Mark 12:30 - Love the Lord your God with all your heart, soul, mind, and strength.",
+        "James 2:17 - In the same way, faith by itself, if it is not accompanied by action, is dead.",
+        "Proverbs 3:6 - In all your ways submit to Him, and He will make your paths straight.",
+        "Romans 12:1 - Therefore, I urge you, brothers and sisters, in view of God's mercy.",
+        "Revelation 21:4 - 'He will wipe every tear from their eyes.'",
+        "Luke 6:38 - Give, and it will be given to you.",
+        "Psalm 23:4 - Even though I walk through the darkest valley, I will fear no evil.",
+        "Matthew 4:4 - Man shall not live on bread alone, but on every word that comes from the mouth of God.",
+        "Mark 16:15 - Go into all the world and preach the gospel to all creation."
+    ];
+
+    // Elements
+    const bibleCover = document.getElementById('bible-cover');
+    const biblePages = document.getElementById('bible-pages');
+    const pageContent = document.getElementById('page-content');
+    const nextPageBtn = document.getElementById('next-page');
+    const prevPageBtn = document.getElementById('prev-page');
+
+    let currentPage = 0;
+
+    // Show verses on page
+    function showPage() {
+        const start = currentPage * 5; // 5 verses per page
+        const end = start + 5;
+        const versesToShow = bibleVerses.slice(start, end);
+        pageContent.innerHTML = versesToShow.map(verse => `<p>${verse}</p>`).join('');
+        prevPageBtn.style.visibility = currentPage === 0 ? 'hidden' : 'visible';
+        nextPageBtn.style.visibility = end >= bibleVerses.length ? 'hidden' : 'visible';
+    }
+
+    // Open the Bible
+    bibleCover.addEventListener('click', () => {
+        bibleCover.style.display = 'none';
+        biblePages.style.display = 'block';
+        showPage();
+    });
+
+    // Navigation buttons
+    nextPageBtn.addEventListener('click', () => {
+        currentPage++;
+        showPage();
+    });
+
+    prevPageBtn.addEventListener('click', () => {
+        currentPage--;
+        showPage();
+    });
+</script>
+</body>
+</html>
